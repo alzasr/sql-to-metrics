@@ -1,0 +1,13 @@
+host: :80
+path: "/metrics"
+jobs:
+  - db:
+      driver: pgx
+      dsn: dbname=example user=db password=db sslmode=disable host=localhost port=5432
+    period: 5s
+    metrics:
+      - name: test
+        query: "SELECT SUM(\"count\") \"total_count\" FROM \"test\""
+        type: gauge
+        values:
+          - total_count
