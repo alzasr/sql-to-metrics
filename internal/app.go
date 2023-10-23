@@ -97,23 +97,28 @@ func makeMetricExecutorGauge(registry *prometheus.Registry, db *sql.DB, metric M
 		defer func() {
 			_ = res.Close()
 		}()
+		colums, err := res.Columns()
+		if err != nil {
+			return fmt.Errorf("colums: %w", err)
+		}
+
 		has := res.Next()
 		if !has {
 			return fmt.Errorf("result is empty")
 		}
-		values := make([]*float64, len(metric.Values))
-		anyValues := make([]any, len(metric.Values))
-		for i := range values {
+		values := make(map[string]*float64, len(colums))
+		anyValues := make([]any, len(colums))
+		for i := range colums {
 			v := 0.0
-			values[i] = &v
-			anyValues[i] = values[i]
+			values[colums[i]] = &v
+			anyValues[i] = &v
 		}
 		err = res.Scan(anyValues...)
 		if err != nil {
 			return fmt.Errorf("scan: %w", err)
 		}
-		for i, value := range metric.Values {
-			gauges[value].Set(*values[i])
+		for _, value := range metric.Values {
+			gauges[value].Set(*values[value])
 		}
 		return nil
 	}, nil
