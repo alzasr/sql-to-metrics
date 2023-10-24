@@ -10,5 +10,6 @@ jobs:
         query: "SELECT SUM(\"count\") \"total_count\", MAX(\"count\") \"max_count\" FROM \"test\""
         type: gauge
         values:
-          - max_count
           - total_count
+        labels:
+          - max_count

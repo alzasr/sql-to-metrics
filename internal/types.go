@@ -27,6 +27,7 @@ type Metric struct {
 	Query  string     `yaml:"query"`
 	Type   MetricType `yaml:"type"`
 	Values []string   `yaml:"values"`
+	Labels []string   `yaml:"labels"`
 }
 
 type DBSettings struct {
@@ -34,4 +35,12 @@ type DBSettings struct {
 	DSN    string `yaml:"dsn"`
 }
 
-type metricExecutor func() error
+type MetricExecutor interface {
+	Run() error
+}
+
+type metricExecutorFunc func() error
+
+func (m metricExecutorFunc) Run() error {
+	return m()
+}
